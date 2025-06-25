@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checklist Veicolo</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #fff; }
+    h2 { background: #00bfff; color: #fff; padding: 12px; }
+    ol li:nth-child(odd) { background: #f0faff; }
+    ol li:nth-child(even) { background: #e5f2ff; }
+    ol li { padding: 6px; margin-bottom: 4px; }
+    .ok { background-color: #28a745 !important; color: white; }
+    .ko, .scaduto { background-color: #dc3545 !important; color: white; }
+    select, input[type="date"] { margin-left: 6px; }
+    button {
+      background: #007bff; color: white; border: none;
+      padding: 10px 14px; margin: 6px 4px; font-weight: bold;
+    }
+    button:hover { background: #0056b3; }
+    .note-icon { cursor: pointer; margin-left: 10px; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Checklist Veicolo <button onclick="resetChecklist()">🔄 Reset</button></h2>
+
+  <label>📌 Targa:</label>
+  <select id="targa">
+    <option value="EM628GH">MO1 EM628GH</option>
+    <option value="DR162EZ">MO2 DR162EZ</option>
+    <option value="FZ060CA">MO3 FZ060CA</option>
+    <option value="GR937XT">MO4 GR937XT</option>
+    <option value="GN720AD">MO5 GN720AD</option>
+  </select><br><br>
+
+  <label>✍️ Firma:</label>
+  <input type="text" id="firma" placeholder="Firma qui"><br><br>
+
+  <h3>📋 Checklist (30 voci):</h3>
+  <ol id="checklist">
+<li>BARELLA 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Liquido freni 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Controllo luci 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Pneumatici 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Clacson 
+      <select onchange="valuta(this)"><option></option><option>OK</option
+<li>Kit pronto soccorso 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Targa leggibile 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Cinture sicurezza 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Aria condizionata 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select
+<li>Luci retromarcia 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Luci posizione 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select> 
+      <input type="date" onchange="verifica(this)">
+    </li>
+    <li>Luci stop 
+      <select onchange="valuta(this)"><option></option><option>OK</option><option>KO</option></select>
+<label>📝 Note:</label><br>
+  <textarea rows="4" cols="40"></textarea>
+  <span class="note-icon" onclick="scattaFoto()">📷</span><br><br>
+
+  <button onclick="scattaFoto()">📸 Scatta Foto</button>
+  <button onclick="salvaPDF()">💾 Salva PDF</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    function valuta(selectElem) {
+      const li = selectElem.parentElement;
+      li.classList.remove("ok", "ko");
+      if (selectElem.value === "OK") li.classList.add("ok");
+      if (selectElem.value === "KO") li.classList.add("ko");
+    }
+
+    function verifica(dateInput) {
+      const oggi = new Date();
+      const inputDate = new Date(dateInput.value);
+      const li = dateInput.parentElement;
+      li.classList.remove("ok", "scaduto");
+      if (dateInput.value) {
+        if (inputDate < oggi) li.classList.add("scaduto");
+        else li.classList.add("ok");
+      }
+    }
+
+    function resetChecklist() {
+      document.getElementById('targa').selectedIndex = 0;
+      document.getElementById('firma').value = '';
+      document.querySelectorAll('ol li').forEach(li => {
+        li.classList.remove("ok", "ko", "scaduto");
+        li.querySelectorAll("select")[0].value = "";
+        li.querySelectorAll("input[type='date']")[0].value = "";
+      });
+    }
+
+    function scattaFoto() {
+      alert("Scatta foto disponibile solo da dispositivi mobili con permessi camera attivi.");
+    }
+
+    async function salvaPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+      doc.text("Checklist Veicolo", 10, 10);
+      doc.text("Targa: " + document.getElementById("targa").value, 10, 20);
+      doc.text("Firma: " + document.getElementById("firma").value, 10, 30);
+
+      let y = 40;
+      document.querySelectorAll("ol li").forEach((li, index) => {
+        const voce = li.textContent.trim().split("OK")[0].split("KO")[0].trim();
+        const esito = li.querySelector("select").value || "--";
+        const data = li.querySelector("input").value || "--";
+        doc.text(`${voce}: ${esito} - Scadenza: ${data}`, 10, y);
+        y += 7;
+      });
+
+      doc.save("checklist.pdf");
+      setTimeout(() => window.print(), 800);
+    }
+  </script>
+</body>
+</html>
